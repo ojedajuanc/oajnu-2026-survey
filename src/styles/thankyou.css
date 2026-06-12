@@ -1,0 +1,22 @@
+.thankyou {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 20px;
+}
+.thankyou__icon {
+  font-size: 3.5rem;
+  color: var(--c-naranja);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.thankyou__title {
+  margin-bottom: 10px;
+}
+.thankyou__body {
+  max-width: 480px;
+  margin: 0 auto 24px;
+}

@@ -1,0 +1,19 @@
+.admin-login {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.admin-login__card {
+  background: var(--c-blanco);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  width: 100%;
+  max-width: 380px;
+}
+.admin-login__title {
+  margin-bottom: 20px;
+  text-align: center;
+}

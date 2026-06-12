@@ -1,0 +1,16 @@
+:root {
+  --c-naranja: #e05206;
+  --c-naranja-bg: #fdf0ea;
+  --c-naranja-d: #b84004;
+  --c-cyan: #009aa6;
+  --c-blanco: #ffffff;
+  --c-gris-f: #f5f5f5;
+  --c-gris-m: #cccccc;
+  --c-gris-b: #888888;
+  --c-gris-d: #333333;
+  --c-error: #d32f2f;
+  --c-success: #2e7d32;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

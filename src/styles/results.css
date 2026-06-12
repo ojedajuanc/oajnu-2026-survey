@@ -1,0 +1,97 @@
+.results__header {
+  margin-bottom: 20px;
+}
+.results__count {
+  font-weight: 800;
+  color: var(--c-naranja);
+}
+.results__empty {
+  color: var(--c-gris-b);
+  font-weight: 700;
+  text-align: center;
+  padding: 40px 0;
+}
+.viz-card {
+  background: var(--c-blanco);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.viz-card__prompt {
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+/* horizontal bars (binary, dropdown, ranking avg) */
+.bar-row {
+  margin-bottom: 12px;
+}
+.bar-row__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.bar-row__track {
+  height: 14px;
+  background: var(--c-gris-f);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.bar-row__fill {
+  height: 100%;
+  background: var(--c-naranja);
+  border-radius: 7px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.number-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-weight: 700;
+}
+.number-stats span strong {
+  color: var(--c-naranja);
+}
+
+.text-list {
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.text-list__item {
+  background: var(--c-gris-f);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.viz-toggle {
+  margin-bottom: 14px;
+}
+
+.freq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.freq-table th,
+.freq-table td {
+  border: 1px solid var(--c-gris-m);
+  padding: 6px 8px;
+  text-align: center;
+}
+.freq-table th {
+  background: var(--c-gris-f);
+  font-weight: 700;
+}
+.freq-table td.label-cell {
+  text-align: left;
+  font-weight: 700;
+}
