@@ -51,10 +51,8 @@ export default function CoverPage() {
       return;
     }
 
-    console.log('[CoverPage] resolving room code:', code);
     getSessionByRoomCode(code)
       .then((result) => {
-        console.log('[CoverPage] getSessionByRoomCode result:', result);
         if (!result) {
           setRoomError(`Código de sala "${code}" no encontrado.`);
         } else {
@@ -64,7 +62,7 @@ export default function CoverPage() {
         setRoomResolved(true);
       })
       .catch((err) => {
-        console.error('[CoverPage] getSessionByRoomCode error:', err);
+        console.error('getSessionByRoomCode error:', err);
         setRoomError('No se pudo resolver el código de sala.');
         setRoomResolved(true);
       });
@@ -118,12 +116,6 @@ export default function CoverPage() {
   }, [roomResolved, user]);
 
   const { survey, session, loading } = useSurvey();
-
-  console.log('[CoverPage] state:', {
-    roomResolved, loading, authStep,
-    activeSurveyId, activeSessionId,
-    hasUser: !!user, survey: !!survey, session: !!session,
-  });
 
   async function handleSendLink() {
     if (!isValidEmail(email)) {
