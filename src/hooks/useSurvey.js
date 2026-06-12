@@ -20,11 +20,17 @@ export function useSurvey(surveyIdProp, sessionIdProp) {
     const unsubSurvey = subscribeSurvey((s) => {
       setSurvey(s);
       setSurveyLoaded(true);
-    }, surveyId);
+    }, surveyId, (err) => {
+      setError(err);
+      setSurveyLoaded(true); // unblock loading so the UI can surface the error
+    });
     const unsubSession = subscribeSession((s) => {
       setSession(s);
       setSessionLoaded(true);
-    }, surveyId, sessionId);
+    }, surveyId, sessionId, (err) => {
+      setError(err);
+      setSessionLoaded(true);
+    });
     return () => {
       unsubSurvey();
       unsubSession();

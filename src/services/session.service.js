@@ -70,10 +70,17 @@ export async function setPublished(published, uid, surveyId, sessionId) {
   );
 }
 
-export function subscribeSession(callback, surveyId, sessionId) {
-  return onSnapshot(sessionRef(surveyId, sessionId), (snap) => {
-    callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
-  });
+export function subscribeSession(callback, surveyId, sessionId, onError) {
+  return onSnapshot(
+    sessionRef(surveyId, sessionId),
+    (snap) => {
+      callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+    },
+    (err) => {
+      console.error('subscribeSession error:', err);
+      if (onError) onError(err);
+    }
+  );
 }
 
 // Resolves a 4-letter room code to { surveyId, sessionId, ...sessionData } via collection group query.

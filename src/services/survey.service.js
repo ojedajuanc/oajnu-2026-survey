@@ -40,10 +40,17 @@ export async function saveSurvey(data, surveyId) {
   );
 }
 
-export function subscribeSurvey(callback, surveyId) {
-  return onSnapshot(surveyRef(surveyId), (snap) => {
-    callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
-  });
+export function subscribeSurvey(callback, surveyId, onError) {
+  return onSnapshot(
+    surveyRef(surveyId),
+    (snap) => {
+      callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+    },
+    (err) => {
+      console.error('subscribeSurvey error:', err);
+      if (onError) onError(err);
+    }
+  );
 }
 
 export async function listSurveys() {
