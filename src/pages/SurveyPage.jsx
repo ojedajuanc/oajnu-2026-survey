@@ -17,6 +17,13 @@ export default function SurveyPage() {
   const navigate = useNavigate();
   const questions = questionsToArray(survey);
 
+  // Per-session key so refreshing /encuesta resumes progress (and distinct
+  // surveys/sessions in the same tab don't share state).
+  const storageKey =
+    activeSurveyId && activeSessionId
+      ? `dyn:progress:${activeSurveyId}:${activeSessionId}`
+      : undefined;
+
   const form = useForm(questions, async (answers) => {
     await writeResponse(
       answers,
@@ -26,7 +33,7 @@ export default function SurveyPage() {
       activeSessionId
     );
     navigate(ROUTES.THANKS, { replace: true });
-  });
+  }, storageKey);
 
   if (loading) return <div className="page-center">Cargando…</div>;
 
