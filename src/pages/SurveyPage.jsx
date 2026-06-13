@@ -66,6 +66,11 @@ export default function SurveyPage() {
             {current.prompt}
             {current.required && <span className="question-card__required">*</span>}
           </div>
+          {(current.description || current.config?.instruction) && (
+            <p className="question-card__description">
+              {current.description || current.config.instruction}
+            </p>
+          )}
 
           <QuestionRenderer
             question={current}

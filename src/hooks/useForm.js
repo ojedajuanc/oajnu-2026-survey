@@ -14,6 +14,11 @@ function isAnswered(question, value) {
     case QUESTION_TYPES.BINARY:
     case QUESTION_TYPES.DROPDOWN:
       return value !== '';
+    case QUESTION_TYPES.CHECK: {
+      const min = question.config.min ?? (question.required ? 1 : 0);
+      const max = question.config.max ?? question.config.options.length;
+      return Array.isArray(value) && value.length >= min && value.length <= max;
+    }
     default:
       return true;
   }

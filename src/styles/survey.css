@@ -84,6 +84,69 @@
   margin-top: 6px;
 }
 
+/* Question-level description (shown under the prompt) */
+.question-card__description,
+.viz-card__description {
+  margin: -4px 0 12px;
+  color: var(--c-gris-b);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Dropdown selected-option description */
+.dropdown__desc {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--c-gris-b);
+}
+
+/* Check (multi-select) renderer */
+.check {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.check__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid var(--c-gris-m);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  background: var(--c-blanco);
+  transition: border-color 0.15s, background 0.15s;
+}
+.check__option--selected {
+  border-color: var(--c-naranja);
+  background: var(--c-naranja-bg);
+}
+.check__option--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.check__option input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--c-naranja);
+}
+.check__option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.check__option-desc {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--c-gris-b);
+}
+.check__hint {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--c-gris-b);
+}
+
 /* Text renderer counter */
 .text-counter {
   text-align: right;

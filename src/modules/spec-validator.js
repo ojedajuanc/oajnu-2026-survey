@@ -1,4 +1,4 @@
-import { QUESTION_TYPES } from '../config/constants.js';
+import { QUESTION_TYPES, normalizeOptions } from '../config/constants.js';
 
 const VALID_TYPES = Object.values(QUESTION_TYPES);
 
@@ -46,6 +46,19 @@ export function validateSurvey(doc) {
     errors.push('Cada pregunta debe tener un orden único.');
 
   return { valid: errors.length === 0, errors };
+}
+
+// Validates dropdown/check options (label objects or legacy strings).
+// Returns the array of labels for callers that need the count.
+function validateOptions(cfg, label, errors) {
+  const opts = normalizeOptions(cfg.options);
+  const labels = opts.map((o) => o.label);
+  if (labels.length < 2) errors.push(`${label}: necesita al menos 2 opciones.`);
+  if (labels.some((l) => !nonEmptyString(l)))
+    errors.push(`${label}: las opciones no pueden estar vacías.`);
+  if (new Set(labels).size !== labels.length)
+    errors.push(`${label}: las opciones no pueden repetirse.`);
+  return labels;
 }
 
 function validateConfig(q, label, errors) {
@@ -97,14 +110,22 @@ function validateConfig(q, label, errors) {
       break;
 
     case QUESTION_TYPES.DROPDOWN: {
-      const opts = Array.isArray(cfg.options) ? cfg.options : [];
-      if (opts.length < 2) errors.push(`${label}: necesita al menos 2 opciones.`);
-      if (opts.some((o) => !nonEmptyString(o)))
-        errors.push(`${label}: las opciones no pueden estar vacías.`);
-      if (new Set(opts).size !== opts.length)
-        errors.push(`${label}: las opciones no pueden repetirse.`);
+      validateOptions(cfg, label, errors);
       break;
     }
+
+    case QUESTION_TYPES.CHECK: {
+      const labels = validateOptions(cfg, label, errors);
+      const n = labels.length;
+      if (cfg.min != null && (!Number.isInteger(cfg.min) || cfg.min < 0 || cfg.min > n))
+        errors.push(`${label}: el mínimo de selecciones debe ser un entero entre 0 y ${n}.`);
+      if (cfg.max != null && (!Number.isInteger(cfg.max) || cfg.max < 1 || cfg.max > n))
+        errors.push(`${label}: el máximo de selecciones debe ser un entero entre 1 y ${n}.`);
+      if (cfg.min != null && cfg.max != null && cfg.min > cfg.max)
+        errors.push(`${label}: el mínimo no puede ser mayor que el máximo.`);
+      break;
+    }
+
     default:
       break;
   }

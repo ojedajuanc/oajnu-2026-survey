@@ -32,6 +32,9 @@ export default function ResultsPage() {
         revealed.map((q) => (
           <div className="viz-card" key={q.id}>
             <div className="viz-card__prompt">{q.prompt}</div>
+            {(q.description || q.config?.instruction) && (
+              <p className="viz-card__description">{q.description || q.config.instruction}</p>
+            )}
             <QuestionViz question={q} result={results[q.id]} />
           </div>
         ))

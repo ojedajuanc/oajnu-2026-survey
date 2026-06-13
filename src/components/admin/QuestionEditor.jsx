@@ -2,7 +2,12 @@ import { useState } from 'react';
 import Modal from '../ui/Modal.jsx';
 import Button from '../ui/Button.jsx';
 import Toggle from '../ui/Toggle.jsx';
-import { QUESTION_TYPES, QUESTION_TYPE_LIST, defaultConfigFor } from '../../config/constants.js';
+import {
+  QUESTION_TYPES,
+  QUESTION_TYPE_LIST,
+  defaultConfigFor,
+  normalizeOptions,
+} from '../../config/constants.js';
 
 let itemSeq = 0;
 function newItemId() {
@@ -14,6 +19,10 @@ function newItemId() {
 export default function QuestionEditor({ question, onSave, onClose }) {
   const [type, setType] = useState(question.type);
   const [prompt, setPrompt] = useState(question.prompt || '');
+  // Legacy ranking questions stored their note in config.instruction; surface it here.
+  const [description, setDescription] = useState(
+    question.description || question.config?.instruction || ''
+  );
   const [required, setRequired] = useState(!!question.required);
   const [config, setConfig] = useState(question.config || defaultConfigFor(question.type));
 
@@ -28,7 +37,16 @@ export default function QuestionEditor({ question, onSave, onClose }) {
   }
 
   function handleSave() {
-    onSave({ ...question, type, prompt, required, config });
+    // Drop the legacy config.instruction now that description is top-level.
+    const { instruction, ...cleanConfig } = config;
+    onSave({
+      ...question,
+      type,
+      prompt,
+      description: description.trim() ? description : '',
+      required,
+      config: cleanConfig,
+    });
   }
 
   return (
@@ -51,6 +69,17 @@ export default function QuestionEditor({ question, onSave, onClose }) {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="¿Qué querés preguntar?"
+        />
+      </div>
+
+      <div className="field">
+        <label className="field__label">Descripción (opcional)</label>
+        <textarea
+          className="input"
+          rows={2}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Texto de ayuda que se muestra debajo del enunciado"
         />
       </div>
 
@@ -152,47 +181,40 @@ function TypeFields({ type, config, patchConfig, setConfig }) {
       );
 
     case QUESTION_TYPES.DROPDOWN:
+      return <OptionsEditor config={config} patchConfig={patchConfig} />;
+
+    case QUESTION_TYPES.CHECK:
       return (
-        <Field label="Opciones">
-          {(config.options || []).map((opt, i) => (
-            <div className="editor-item-row" key={i}>
-              <input
-                className="input"
-                value={opt}
-                onChange={(e) => {
-                  const options = [...config.options];
-                  options[i] = e.target.value;
-                  patchConfig({ options });
-                }}
-              />
-              <button
-                type="button"
-                className="qlist__btn qlist__btn--del"
-                onClick={() => patchConfig({ options: config.options.filter((_, j) => j !== i) })}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            onClick={() => patchConfig({ options: [...(config.options || []), ''] })}
-          >
-            + Agregar opción
-          </Button>
-        </Field>
+        <>
+          <OptionsEditor config={config} patchConfig={patchConfig} />
+          <Field label="Mínimo de selecciones (opcional)">
+            <input
+              className="input"
+              type="number"
+              min={0}
+              value={config.min ?? ''}
+              onChange={(e) =>
+                patchConfig({ min: e.target.value === '' ? null : Number(e.target.value) })
+              }
+            />
+          </Field>
+          <Field label="Máximo de selecciones (opcional)">
+            <input
+              className="input"
+              type="number"
+              min={1}
+              value={config.max ?? ''}
+              onChange={(e) =>
+                patchConfig({ max: e.target.value === '' ? null : Number(e.target.value) })
+              }
+            />
+          </Field>
+        </>
       );
 
     case QUESTION_TYPES.RANKING:
       return (
         <>
-          <Field label="Instrucción (opcional)">
-            <input
-              className="input"
-              value={config.instruction || ''}
-              onChange={(e) => patchConfig({ instruction: e.target.value || null })}
-            />
-          </Field>
           <Field label="Ítems">
             {(config.items || []).map((it, i) => (
               <div className="editor-item-row" key={it.id}>
@@ -268,5 +290,52 @@ function Field({ label, children }) {
       <label className="field__label">{label}</label>
       {children}
     </div>
+  );
+}
+
+// Shared label + optional-description options editor for dropdown / check types.
+// Normalizes legacy string options to { label, description } objects.
+function OptionsEditor({ config, patchConfig }) {
+  const options = normalizeOptions(config.options);
+
+  function update(i, patch) {
+    const next = options.map((o, j) => (j === i ? { ...o, ...patch } : o));
+    patchConfig({ options: next });
+  }
+
+  return (
+    <Field label="Opciones">
+      {options.map((opt, i) => (
+        <div className="editor-option" key={i}>
+          <div className="editor-item-row">
+            <input
+              className="input"
+              placeholder="Etiqueta"
+              value={opt.label}
+              onChange={(e) => update(i, { label: e.target.value })}
+            />
+            <button
+              type="button"
+              className="qlist__btn qlist__btn--del"
+              onClick={() => patchConfig({ options: options.filter((_, j) => j !== i) })}
+            >
+              ✕
+            </button>
+          </div>
+          <input
+            className="input"
+            placeholder="Descripción (opcional)"
+            value={opt.description}
+            onChange={(e) => update(i, { description: e.target.value })}
+          />
+        </div>
+      ))}
+      <Button
+        variant="outline"
+        onClick={() => patchConfig({ options: [...options, { label: '', description: '' }] })}
+      >
+        + Agregar opción
+      </Button>
+    </Field>
   );
 }

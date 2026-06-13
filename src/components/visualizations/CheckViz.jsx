@@ -1,6 +1,6 @@
 import { normalizeOptions } from '../../config/constants.js';
 
-export default function DropdownViz({ question, result }) {
+export default function CheckViz({ question, result }) {
   const { counts = {}, total = 0 } = result || {};
   const rows = normalizeOptions(question.config.options)
     .map((opt) => ({ label: opt.label, count: counts[opt.label] || 0 }))
@@ -19,7 +19,7 @@ export default function DropdownViz({ question, result }) {
               </span>
             </div>
             <div className="bar-row__track">
-              <div className="bar-row__fill" style={{ width: `${pct}%` }} />
+              <div className="bar-row__fill" style={{ width: `${Math.min(pct, 100)}%` }} />
             </div>
           </div>
         );

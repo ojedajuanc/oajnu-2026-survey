@@ -4,6 +4,7 @@ import RankingRenderer from './RankingRenderer.jsx';
 import NumberRenderer from './NumberRenderer.jsx';
 import TextRenderer from './TextRenderer.jsx';
 import DropdownRenderer from './DropdownRenderer.jsx';
+import CheckRenderer from './CheckRenderer.jsx';
 
 const MAP = {
   [QUESTION_TYPES.BINARY]: BinaryRenderer,
@@ -11,6 +12,7 @@ const MAP = {
   [QUESTION_TYPES.NUMBER]: NumberRenderer,
   [QUESTION_TYPES.TEXT]: TextRenderer,
   [QUESTION_TYPES.DROPDOWN]: DropdownRenderer,
+  [QUESTION_TYPES.CHECK]: CheckRenderer,
 };
 
 export default function QuestionRenderer({ question, value, onChange }) {

@@ -89,6 +89,20 @@
   flex: 1;
 }
 
+/* Option block: label row + description input grouped together */
+.editor-option {
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--c-gris-m);
+  border-radius: var(--radius);
+}
+.editor-option .editor-item-row {
+  margin-bottom: 8px;
+}
+.editor-option > .input {
+  width: 100%;
+}
+
 .save-bar {
   position: sticky;
   bottom: 0;

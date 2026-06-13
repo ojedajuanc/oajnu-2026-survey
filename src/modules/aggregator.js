@@ -1,4 +1,4 @@
-import { QUESTION_TYPES } from '../config/constants.js';
+import { QUESTION_TYPES, normalizeOptions } from '../config/constants.js';
 
 // computeResults(questions, responses) → { [questionId]: ResultData }
 // questions: array of { id, type, config, ... }
@@ -76,12 +76,24 @@ function computeForQuestion(q, values) {
 
     case QUESTION_TYPES.DROPDOWN: {
       const counts = {};
-      for (const o of q.config?.options || []) counts[o] = 0;
+      for (const o of normalizeOptions(q.config?.options)) counts[o.label] = 0;
       let total = 0;
       for (const v of values) {
         if (typeof v !== 'string') continue;
         counts[v] = (counts[v] || 0) + 1;
         total++;
+      }
+      return { counts, total };
+    }
+
+    case QUESTION_TYPES.CHECK: {
+      const counts = {};
+      for (const o of normalizeOptions(q.config?.options)) counts[o.label] = 0;
+      let total = 0; // number of respondents
+      for (const v of values) {
+        if (!Array.isArray(v)) continue;
+        total++;
+        for (const o of v) counts[o] = (counts[o] || 0) + 1;
       }
       return { counts, total };
     }

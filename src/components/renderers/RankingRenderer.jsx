@@ -53,7 +53,7 @@ function Slot({ index, item, onRemove }) {
 
 // value: string[] of item ids (ordered, may be shorter than selectCount).
 export default function RankingRenderer({ question, value, onChange }) {
-  const { items, selectCount, instruction } = question.config;
+  const { items, selectCount } = question.config;
   const ranked = value || [];
 
   const sensors = useSensors(
@@ -102,7 +102,6 @@ export default function RankingRenderer({ question, value, onChange }) {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      {instruction && <p className="ranking__instruction">{instruction}</p>}
       <div className="ranking__pool">
         {pool.length === 0 ? (
           <span className="slot__empty">Todas las opciones fueron ubicadas.</span>

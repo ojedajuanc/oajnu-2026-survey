@@ -4,6 +4,7 @@ import RankingViz from './RankingViz.jsx';
 import NumberViz from './NumberViz.jsx';
 import TextViz from './TextViz.jsx';
 import DropdownViz from './DropdownViz.jsx';
+import CheckViz from './CheckViz.jsx';
 
 const MAP = {
   [QUESTION_TYPES.BINARY]: BinaryViz,
@@ -11,6 +12,7 @@ const MAP = {
   [QUESTION_TYPES.NUMBER]: NumberViz,
   [QUESTION_TYPES.TEXT]: TextViz,
   [QUESTION_TYPES.DROPDOWN]: DropdownViz,
+  [QUESTION_TYPES.CHECK]: CheckViz,
 };
 
 export default function QuestionViz({ question, result }) {
