@@ -4,16 +4,10 @@ import { useActiveSurvey } from '../context/ActiveSurveyContext.jsx';
 import { useAuthContext } from '../context/AuthContext.jsx';
 import { getSessionByRoomCode } from '../services/session.service.js';
 import { hasParticipantResponded } from '../services/response.service.js';
-import {
-  sendParticipantEmailLink,
-  isEmailLink,
-  signInWithLink,
-} from '../services/auth.service.js';
+import { signInParticipant } from '../services/auth.service.js';
 import { useSurvey } from '../hooks/useSurvey.js';
 import { ROUTES } from '../config/constants.js';
 import Button from '../components/ui/Button.jsx';
-
-const EMAIL_KEY = 'participantEmailForSignIn';
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -22,15 +16,20 @@ function isValidEmail(email) {
 export default function CoverPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeSurveyId, activeSessionId, setActiveSurveyId, setActiveSessionId } = useActiveSurvey();
+  const {
+    activeSurveyId,
+    activeSessionId,
+    setActiveSurveyId,
+    setActiveSessionId,
+    setParticipantEmail,
+  } = useActiveSurvey();
   const { user } = useAuthContext();
 
   const [roomResolved, setRoomResolved] = useState(false);
   const [roomError, setRoomError] = useState(null);
-  const [roomCode, setRoomCode] = useState(null);
 
   // Auth flow states
-  const [authStep, setAuthStep] = useState('idle'); // idle | email-entry | link-sent | signing-in | checking | done | already-responded
+  const [authStep, setAuthStep] = useState('idle'); // idle | email-entry | signing-in | checking | done | already-responded
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [authError, setAuthError] = useState('');
@@ -39,7 +38,6 @@ export default function CoverPage() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const code = params.get('room');
-    if (code) setRoomCode(code);
 
     if (!code) {
       setRoomResolved(true);
@@ -68,28 +66,6 @@ export default function CoverPage() {
       });
   }, []);
 
-  // Step 2: Handle email link sign-in when landing back from email link
-  useEffect(() => {
-    if (!isEmailLink(window.location.href)) return;
-
-    setAuthStep('signing-in');
-    let storedEmail = localStorage.getItem(EMAIL_KEY);
-    if (!storedEmail) {
-      storedEmail = window.prompt('Por favor ingresá tu email para confirmar el acceso:') || '';
-    }
-
-    signInWithLink(storedEmail, window.location.href)
-      .then(() => {
-        localStorage.removeItem(EMAIL_KEY);
-        // Clean up the sign-in link from URL without reload
-        window.history.replaceState(null, '', window.location.pathname + window.location.hash.split('?')[0] + (roomCode ? `?room=${roomCode}` : ''));
-      })
-      .catch((err) => {
-        setAuthError('No se pudo completar el acceso. Intentá de nuevo.');
-        setAuthStep('email-entry');
-      });
-  }, []);
-
   // Step 3: Once user is authenticated (or already was), check duplicate + show start button
   useEffect(() => {
     if (!user || !activeSurveyId || !activeSessionId) return;
@@ -109,7 +85,6 @@ export default function CoverPage() {
   useEffect(() => {
     if (!roomResolved) return;
     if (user) return; // already handled by step 3
-    if (isEmailLink(window.location.href)) return; // handled by step 2
     if (authStep === 'idle') {
       setAuthStep('email-entry');
     }
@@ -117,7 +92,7 @@ export default function CoverPage() {
 
   const { survey, session, loading } = useSurvey();
 
-  async function handleSendLink() {
+  async function handleEnter() {
     if (!isValidEmail(email)) {
       setEmailError('Ingresá un email válido.');
       return;
@@ -125,19 +100,12 @@ export default function CoverPage() {
     setEmailError('');
     setAuthStep('signing-in');
 
-    const params = new URLSearchParams(location.search);
-    const code = params.get('room') || roomCode;
-    const redirectUrl = `${window.location.origin}${window.location.pathname}${window.location.hash.split('?')[0]}${code ? `?room=${code}` : ''}`;
-
     try {
-      await sendParticipantEmailLink(email, {
-        url: redirectUrl,
-        handleCodeInApp: true,
-      });
-      localStorage.setItem(EMAIL_KEY, email);
-      setAuthStep('link-sent');
+      setParticipantEmail(email);
+      await signInParticipant();
+      // onAuthStateChanged sets `user`; Step 3 takes over (duplicate check → done).
     } catch (err) {
-      setAuthError('No se pudo enviar el enlace. Verificá el email e intentá de nuevo.');
+      setAuthError('No se pudo acceder. Intentá de nuevo.');
       setAuthStep('email-entry');
     }
   }
@@ -170,17 +138,6 @@ export default function CoverPage() {
     return <div className="page-center">Verificando acceso…</div>;
   }
 
-  if (authStep === 'link-sent') {
-    return (
-      <div className="cover">
-        <h1 className="cover__title">Revisá tu email</h1>
-        <p className="cover__desc">
-          Te enviamos un enlace a <strong>{email}</strong>. Hacé clic en el enlace para continuar.
-        </p>
-      </div>
-    );
-  }
-
   if (authStep === 'already-responded') {
     return (
       <div className="cover">
@@ -210,13 +167,13 @@ export default function CoverPage() {
               placeholder="tu@email.com"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendLink()}
+              onKeyDown={(e) => e.key === 'Enter' && handleEnter()}
               autoFocus
             />
             {emailError && <p className="cover__field-error">{emailError}</p>}
             {authError && <p className="cover__field-error">{authError}</p>}
-            <Button variant="primary" lg onClick={handleSendLink}>
-              Enviar enlace →
+            <Button variant="primary" lg onClick={handleEnter}>
+              Comenzar →
             </Button>
           </div>
         )}

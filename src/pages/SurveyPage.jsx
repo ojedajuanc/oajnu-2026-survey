@@ -13,7 +13,7 @@ import QuestionRenderer from '../components/renderers/QuestionRenderer.jsx';
 export default function SurveyPage() {
   const { survey, session, loading } = useSurvey();
   const { user } = useAuthContext();
-  const { activeSurveyId, activeSessionId } = useActiveSurvey();
+  const { activeSurveyId, activeSessionId, participantEmail } = useActiveSurvey();
   const navigate = useNavigate();
   const questions = questionsToArray(survey);
 
@@ -21,7 +21,7 @@ export default function SurveyPage() {
     await writeResponse(
       answers,
       user?.uid ?? null,
-      user?.email ?? null,
+      participantEmail ?? null,
       activeSurveyId,
       activeSessionId
     );

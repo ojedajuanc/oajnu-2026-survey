@@ -13,7 +13,8 @@ Construida con **Vite + React 18 + Firebase (Firestore + Auth)**.
    ```
 
 2. Crear un proyecto en [Firebase](https://console.firebase.google.com/):
-   - Habilitar **Firestore** y **Authentication → Email/Password**.
+   - Habilitar **Firestore**.
+   - En **Authentication → Sign-in method**, habilitar **Email/Password** (login del moderador) y **Anonymous** (acceso de participantes).
    - Crear un usuario moderador (Authentication → Users → Add user).
 
 3. Copiar `.env.example` a `.env.local` y completar con los valores de tu app web de Firebase:

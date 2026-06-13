@@ -2,9 +2,7 @@ import {
   signInWithEmailAndPassword,
   signOut as fbSignOut,
   onAuthStateChanged,
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
+  signInAnonymously,
 } from 'firebase/auth';
 import { auth } from '../config/firebase.js';
 
@@ -21,17 +19,9 @@ export function subscribeAuth(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-// Participant auth (Email Link / passwordless)
-// actionCodeSettings.url must include the room code so the participant lands
-// back on the correct survey: { url: '.../#/?room=KBJM', handleCodeInApp: true }
-export function sendParticipantEmailLink(email, actionCodeSettings) {
-  return sendSignInLinkToEmail(auth, email, actionCodeSettings);
-}
-
-export function isEmailLink(url) {
-  return isSignInWithEmailLink(auth, url);
-}
-
-export function signInWithLink(email, url) {
-  return signInWithEmailLink(auth, email, url);
+// Participant auth (Anonymous): grants a stable UID instantly, no email round-trip.
+// The participant's email is captured separately in the UI and stored with the response.
+// Requires "Anonymous" provider enabled in Firebase Console → Authentication.
+export function signInParticipant() {
+  return signInAnonymously(auth);
 }
