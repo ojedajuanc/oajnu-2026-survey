@@ -68,7 +68,19 @@ export default function RankingViz({ question, result }) {
                   const rank = i + 1;
                   const count = frequency[it.id]?.[rank] || 0;
                   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                  return <td key={i}>{pct}%</td>;
+                  // Heatmap: alpha proporcional al %, texto oscuro/blanco según intensidad
+                  const alpha = pct / 100;
+                  return (
+                    <td
+                      key={i}
+                      style={{
+                        backgroundColor: `rgba(37, 99, 235, ${alpha})`,
+                        color: alpha > 0.55 ? '#fff' : 'inherit',
+                      }}
+                    >
+                      {pct}%
+                    </td>
+                  );
                 })}
               </tr>
             ))}
